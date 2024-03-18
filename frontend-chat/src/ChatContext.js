@@ -15,7 +15,7 @@ export const ChatProvider = ({ children }) => {
         sender: 'user',
       }
   ]);
-  const [cc,setCc] = useState(true)
+  const [cc,setCc] = useState(false)
   const [sentiment,setSentiment] = useState("Neutral");
   
   return (

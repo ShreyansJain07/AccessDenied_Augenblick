@@ -1,12 +1,13 @@
 import { useState, useContext, useRef, useEffect } from "react";
 import { ChatContext } from "../ChatContext";
 import axios from "axios";
+import {Link} from "react-router-dom"
 
 export default function Chat() {
-  const { chatState, setChatState,sentiment,setSentiment } = useContext(ChatContext);
+  const { chatState, setChatState,sentiment,setSentiment,setCc } = useContext(ChatContext);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
-
+const[botResponse,setbotResponse]=useState("")
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -14,7 +15,23 @@ export default function Chat() {
   useEffect(() => {
     scrollToBottom();
   }, [chatState]);
-
+  const NewResponse = () => {
+   
+    if (botResponse.includes("customer care team")) {
+      
+      sendBotMessage("I'm redirecting you to our customer care team for assistance.");
+    } else if (botResponse.includes("redirected")) {
+     
+      sendBotMessage("You've been redirected to another team for assistance.");
+    } else if (botResponse.includes("not enough context")) {
+      
+      sendBotMessage("I'm sorry, but I need more context to assist you further.");
+    }
+  };
+  useEffect(() => {
+    NewResponse();
+  }, [botResponse]);
+  
   const fetchNode = async (results, prompt) => {
     try {
       const response = await axios.post("http://localhost:3001/replicate", {
@@ -22,6 +39,7 @@ export default function Chat() {
         results,
       });
       console.log("Response data:", response.data.output);
+      setbotResponse(response.data.output.join(" "));
       setChatState((prev) => [
         ...prev,
         {
@@ -85,19 +103,39 @@ export default function Chat() {
       setMessage("");
     }
   };
-
+  const sendBotMessage = async (message) => {
+    if (message.trim() !== "") {
+      setChatState((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: message.trim(),
+          sender: "bot",
+        },
+      ]);
+    }
+  };
+  
   return (
     <div className="flex h-screen bg-[#121212]">
       <div className="m-auto  w-full max-w-2xl rounded-lg bg-[#1E1E1E] p-4">
         <div className="flex items-center justify-between pb-3">
           <h2 className="text-lg font-semibold text-white">Chatbot</h2>
           {/* SettingsIcon */}
+          <Link to="/dashboard"
+            className="bg-red-400 hover:bg-green-400 text-white px-3 py-1 rounded-md font-semibold"
+            onClick={() => {
+              setCc(true);
+              
+            }}
+          >
+            Not Satisfied
+          </Link>
         </div>
         <p className="text-sm text-gray-400">
-          Chatting with the Astra chatbot is a breeze! Simply type your
-          questions or requests in a clear and concise manner. Responses are
-          sourced from Astra documentation and a link for further reading is
-          provided.
+          Chatting with the Augenblick chatbot is a breeze! Simply type your
+          questions or requests in a clear and concise manner.
+         
         </p>
         <div className="mt-4 h-[500px] overflow-y-auto rounded-md bg-[#252526] p-4">
           <div className="space-y-4">
