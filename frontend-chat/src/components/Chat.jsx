@@ -21,7 +21,21 @@ export default function Chat() {
         prompt,
         results
       });
-      console.log("Response data:", response.data);
+      console.log("Response data:", response.data.output);
+      setChatState((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: message.trim(),
+          sender: "user",
+        },
+        {
+          id: Date.now() + 1,
+          message: response.data.output.join(' '),
+          sender: "bot",
+        },
+      ]);
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -51,7 +65,7 @@ export default function Chat() {
           },
         ]);
         fetchFlask(message)
-        setMessage(""); // Clearing input field
+        setMessage("");
     }
   };
 
