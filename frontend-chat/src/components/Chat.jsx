@@ -1,5 +1,6 @@
 import { useState, useContext, useRef, useEffect } from "react";
 import { ChatContext } from "../ChatContext";
+import axios from "axios"
 
 export default function Chat() {
   const { chatState, setChatState } = useContext(ChatContext);
@@ -14,17 +15,43 @@ export default function Chat() {
     scrollToBottom();
   }, [chatState]);
 
-  const sendMessage = () => {
+  const fetchNode = async (results, prompt) => {
+    try {
+      const response = await axios.post("http://localhost:3001/replicate", {
+        prompt,
+        results
+      });
+      console.log("Response data:", response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  
+
+  const fetchFlask = async (message) => {
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/query",{
+        query: message.trim(),
+      });
+      console.log(response.data.documents.join(' '));
+      fetchNode(response.data.documents.join(','),message)
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  }
+
+  const sendMessage = async () => {
     if (message.trim() !== "") {
-      setChatState((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          message,
-          sender: "user",
-        },
-      ]);
-      setMessage("");
+        setChatState((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            message: message.trim(),
+            sender: "user",
+          },
+        ]);
+        fetchFlask(message)
+        setMessage(""); // Clearing input field
     }
   };
 
