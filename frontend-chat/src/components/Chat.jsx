@@ -31,6 +31,70 @@ const[botResponse,setbotResponse]=useState("")
   useEffect(() => {
     NewResponse();
   }, [botResponse]);
+
+  // const fetchNode = async (results, prompt) => {
+  //   try {
+  //     const response = await axios.post("http://localhost:3001/replicate", {
+  //       prompt,
+  //       results,
+  //     });
+  
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! Status: ${response.status}`);
+  //     }
+  
+  //     // Extract the output from the response
+  //     const output = response.data.output.join(" ");
+  //     correctOutputWithEdenAI(output)
+  //     // Use Eden AI to correct indentation and text
+  //     console.log(output);
+  
+  //     // Update bot response state with the corrected output
+      
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+  
+  // // Function to correct output using Eden AI
+  // const correctOutputWithEdenAI = async (output) => {
+  //   try {
+  //     const response = await fetch(
+  //       "https://api.edenai.run/v2/text/generation",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMjA4OTEzZGYtODBiZS00ZmRiLWE0ZDMtMjI3NzQyYjg0MmJjIiwidHlwZSI6ImFwaV90b2tlbiJ9.AW10Hz3bl4eA3SpD8GrndUUCB9lo6BBhInt_O3DuJTk`,
+  //         },
+  //         body: JSON.stringify({
+  //           text: output,
+  //         }),
+  //       }
+  //     );
+  
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! Status: ${response.status}`);
+  //     }
+  
+  //     const data = await response.json();
+  //     setbotResponse(data.corrected_text);
+  
+  //     // Update chat state with the corrected output
+  //     setChatState((prev) => [
+  //       ...prev,
+  //       {
+  //         id: Date.now() + 1,
+  //         message: data.corrected_text,
+  //         sender: "bot",
+  //       },
+  //     ]);
+  //   } catch (error) {
+  //     console.error("Error correcting output with Eden AI:", error);
+  //     return output; // Return original output if an error occurs
+  //   }
+  // };
+  
   
   const fetchNode = async (results, prompt) => {
     try {
@@ -39,20 +103,45 @@ const[botResponse,setbotResponse]=useState("")
         results,
       });
       console.log("Response data:", response.data.output);
-      setbotResponse(response.data.output.join(" "));
+      generateText(response.data.output.join(" "))
+
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  async function generateText(text) {
+    const options = {
+      method: "POST",
+      url: "https://api.edenai.run/v2/text/generation",
+      headers: {
+        authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOGZjMDdiMWItZDVhYS00MDEwLWJjMzEtYjRjMGJjNmNmOWJkIiwidHlwZSI6ImFwaV90b2tlbiJ9.FRpoCr6xHdRLkoW_ysOWdzAqW7gS-blH9cdHAo3NAaY",
+      },
+      data: {
+        providers: "google",
+        text: `correct this ${text} properly without asterisk and should be accurate`,
+        temperature: 0.2,
+        max_tokens: 1024,
+        fallback_providers: "",
+      },
+    };
+  
+    try {
+      const response = await axios.request(options);
+      console.log(response.data);
       setChatState((prev) => [
         ...prev,
         {
           
           id: Date.now() + 1,
-          message: response.data.output.join(" "),
+          message: response.data.google.generated_text,
           sender: "bot",
         },
       ]);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error(error);
     }
-  };
+  }
 
   const fetchFlask = async (message) => {
     try {
@@ -169,7 +258,7 @@ const[botResponse,setbotResponse]=useState("")
           />
           <button
             onClick={() => sendMessage()}
-            className="ml-2 bg-[#007ACC] py-2 px-4 text-white"
+            className="ml-2 bg-[#007ACC] py-2 px-4 rounded-md text-white"
           >
             Send
           </button>

@@ -22,7 +22,7 @@ app.post("/replicate", async (req, res) => {
   try {
     const output = await replicate.run("mistralai/mixtral-8x7b-instruct-v0.1", {
       input: {
-        prompt: `These are the vector database results: ${results}. This is the prompt: ${prompt}. Please provide an answer according to the prompt. be more straight to the point and accurate dont write that its based on the database just write the best answer in the sentence`,
+        prompt: `This is some data: ${results}. This is the prompt: ${prompt}. Please provide an answer according to the prompt. be more straight to the point and accurate dont write that its based on the database just write the best answer in the sentence.if u dont have enough context please reply strictly with "I dont have enough context your chat will be redirected to our customer care team".`,
         temperature: 0.6,
         max_new_tokens: 1024,
       },
