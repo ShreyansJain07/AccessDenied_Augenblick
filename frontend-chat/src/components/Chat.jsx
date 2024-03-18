@@ -1,6 +1,6 @@
 import { useState, useContext, useRef, useEffect } from "react";
 import { ChatContext } from "../ChatContext";
-import axios from "axios"
+import axios from "axios";
 
 export default function Chat() {
   const { chatState, setChatState } = useContext(ChatContext);
@@ -19,48 +19,46 @@ export default function Chat() {
     try {
       const response = await axios.post("http://localhost:3001/replicate", {
         prompt,
-        results
+        results,
       });
       console.log("Response data:", response.data.output);
       setChatState((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
-          message: response.data.output.join(' '),
+          message: response.data.output.join(" "),
           sender: "bot",
         },
       ]);
-
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
-  
 
   const fetchFlask = async (message) => {
     try {
-      const response = await axios.post("http://127.0.0.1:5000/query",{
+      const response = await axios.post("http://127.0.0.1:5000/query", {
         query: message.trim(),
       });
-      console.log(response.data.documents.join(' '));
-      fetchNode(response.data.documents.join(','),message)
+      console.log(response.data.documents.join(" "));
+      fetchNode(response.data.documents.join(","), message);
     } catch (error) {
       console.error("Error sending message:", error);
     }
-  }
+  };
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
-        setChatState((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            message: message.trim(),
-            sender: "user",
-          },
-        ]);
-        fetchFlask(message)
-        setMessage("");
+      setChatState((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: message.trim(),
+          sender: "user",
+        },
+      ]);
+      fetchFlask(message);
+      setMessage("");
     }
   };
 
@@ -77,19 +75,23 @@ export default function Chat() {
           sourced from Astra documentation and a link for further reading is
           provided.
         </p>
-        <div className="mt-4 h-[300px] overflow-y-auto rounded-md bg-[#252526] p-4">
+        <div className="mt-4 h-[500px] overflow-y-auto rounded-md bg-[#252526] p-4">
           <div className="space-y-4">
-            {chatState.map((message) => (
+            {chatState.map((message,id) => (
               <div
-                key={message.id}
-                className={`rounded-md p-4 ${
-                  message.sender === "bot"
-                    ? "bg-[#333333] justify-start"
-                    : "bg-[#8A2BE2] justify-end"
-                } flex`}
-                style={{ maxWidth: "80%" }}
+              key={id}
+                className={`rounded-md flex`}
               >
-                <p className="text-sm text-white">{message.message}</p>
+                <div
+                  key={id}
+                  className={`rounded-md p-4 ${
+                    message.sender === "bot"
+                      ? "bg-[#333333] flex-start"
+                      : "bg-[#8A2BE2] ml-auto flex-end"
+                  } flex`}
+                >
+                  <p className="text-sm text-white">{message.message}</p>
+                </div>
               </div>
             ))}
             <div ref={messagesEndRef} />
