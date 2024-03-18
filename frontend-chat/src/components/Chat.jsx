@@ -3,7 +3,7 @@ import { ChatContext } from "../ChatContext";
 import axios from "axios";
 
 export default function Chat() {
-  const { chatState, setChatState } = useContext(ChatContext);
+  const { chatState, setChatState,sentiment,setSentiment } = useContext(ChatContext);
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef(null);
 
@@ -48,6 +48,28 @@ export default function Chat() {
     }
   };
 
+  const fetchSentiment = async () => {
+    const query = chatState
+      .filter((msg) => msg.sender === "user")
+      .map((msg) => msg.message)
+      .join(" ");
+  
+    if (query.split(" ").length >= 3) {
+      try {
+        const response = await axios.post("http://localhost:3001/sentiment", {
+          message: query,
+        });
+        console.log(response.data.output);
+        setSentiment(response.data.output);
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    } else {
+      console.log("Not enough user messages to analyze sentiment.");
+    }
+  };
+  
+
   const sendMessage = async () => {
     if (message.trim() !== "") {
       setChatState((prev) => [
@@ -59,6 +81,7 @@ export default function Chat() {
         },
       ]);
       fetchFlask(message);
+      fetchSentiment(message);
       setMessage("");
     }
   };

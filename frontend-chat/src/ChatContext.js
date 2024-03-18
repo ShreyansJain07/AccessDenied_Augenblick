@@ -13,16 +13,12 @@ export const ChatProvider = ({ children }) => {
         id: 2,
         message: 'Hey bot',
         sender: 'user',
-      },
-      {
-        id: 3,
-        message: 'tell me your query',
-        sender: 'bot',
-      },
+      }
   ]);
+  const [sentiment,setSentiment] = useState("Neutral");
 
   return (
-    <ChatContext.Provider value={{ chatState, setChatState }}>
+    <ChatContext.Provider value={{ chatState, setChatState,sentiment,setSentiment }}>
       {children}
     </ChatContext.Provider>
   );
