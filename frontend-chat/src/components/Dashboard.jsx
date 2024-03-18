@@ -25,7 +25,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="font-semibold">Summary:</span>
-                  <span>Unable to log in to the account</span>
+                  <span>Laptops not working</span>
                 </div>
               </div>
               <button className="w-[40] border-4 max-w-xs margin-auto px-[17px] py-[8px] mt-10 rounded-lg transition-all hover:bg-black hover:text-white hover:border-0 hover:scale-105" size="lg" variant="outline">

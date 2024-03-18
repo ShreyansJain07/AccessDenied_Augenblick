@@ -25,6 +25,7 @@ export default function Chat() {
       setChatState((prev) => [
         ...prev,
         {
+          
           id: Date.now() + 1,
           message: response.data.output.join(" "),
           sender: "bot",
