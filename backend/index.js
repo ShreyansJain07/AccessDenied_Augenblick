@@ -24,7 +24,7 @@ app.post('/replicate', async (req, res) => {
         "mistralai/mixtral-8x7b-instruct-v0.1",
       {
         input: {
-          prompt: `These are the vector database results: ${results}. This is the prompt: ${prompt}. Please provide an answer according to the prompt. be more straight to the point and accurate dont write that its based on the database just write the best answer in the sentence`,
+          prompt: `These are the vector database results: ${results}. This is the prompt: ${prompt}. Please provide an answer according to the prompt. be more straight to the point and accurate dont write that its based on the database just write the best answer in the sentence .if u dont have enough context just write the exact word "I dont have enough context.We will get back to you soon " and nothing extra. `,
           temperature: 0.6,
           max_new_tokens: 1024,
         }
