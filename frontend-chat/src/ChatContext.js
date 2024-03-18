@@ -15,10 +15,11 @@ export const ChatProvider = ({ children }) => {
         sender: 'user',
       }
   ]);
+  const [cc,setCc] = useState(true)
   const [sentiment,setSentiment] = useState("Neutral");
-
+  
   return (
-    <ChatContext.Provider value={{ chatState, setChatState,sentiment,setSentiment }}>
+    <ChatContext.Provider value={{ chatState, setChatState,sentiment,setSentiment,cc,setCc }}>
       {children}
     </ChatContext.Provider>
   );
