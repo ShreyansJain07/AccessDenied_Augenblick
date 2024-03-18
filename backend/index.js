@@ -8,10 +8,10 @@ app.use(cors());
 app.use(express.json()); // Middleware to parse JSON bodies
 
 app.post('/replicate', async (req, res) => {
-  const { imageDataURL, prompt } = req.body;
+  const { results, prompt } = req.body;
 
-  if (!imageDataURL || !prompt) {
-    return res.status(400).json({ error: 'Image data URL or prompt is missing.' });
+  if (!results || !prompt) {
+    return res.status(400).json({ error: 'Missing required parameters.' });
   }
 
   // Assuming 'Replicate' is configured correctly
@@ -21,22 +21,24 @@ app.post('/replicate', async (req, res) => {
 
   try {
     const output = await replicate.run(
-        "jagilley/controlnet-scribble:435061a1b5a4c1e26740464bf786efdfa9cb3a3ac488595a2de23e143fdb0117", // Replace with your actual model ID
+        "mistralai/mixtral-8x7b-instruct-v0.1", // Replace with your actual model ID
       {
         input: {
-          eta: 0,
-          image: imageDataURL,
-          scale: 9,
-          prompt: prompt,
-          a_prompt: "best quality, extremely detailed", 
-          n_prompt: "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality,unrealistic, saturated, high contrast, big nose, painting, drawing, sketch, cartoon, anime, manga, render, CG, 3d, watermark, signature, label",
-          ddim_steps: 20,
-          num_samples: "1",
-          image_resolution: "512"
+          top_k: 50,
+          top_p: 0.9,
+          prompt: `These are the vector database results: ${results.join(', ')}. This is the prompt: ${prompt}. Please provide an answer according to the prompt. be more straight to the point and accurate dont write that its based on the database just write the best answer in the sentence`,
+          temperature: 0.6,
+          max_new_tokens: 1024,
+          prompt_template: "<s>[INST] {prompt} [/INST] ",
+          presence_penalty: 0,
+          frequency_penalty: 0,
         }
       }
     );
-    res.json({ output : output[1] });
+ console.log(output)
+    // Post-process the output to form a complete sentence
+    const sentence = output;
+    res.json({ output: sentence });
   } catch (error) {
     console.error("Error during replication:", error);
     res.status(500).json({ error: 'Internal Server Error' });
